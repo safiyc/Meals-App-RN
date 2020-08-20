@@ -1,6 +1,8 @@
 // where we select italian, american, chinese,...
 import React from 'react';
 import { View, Text, Button, FlatList, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import HeaderButton from '../components/HeaderButton';
 
 import { CATEGORIES } from '../data/dummy-data';
 // import Colors from '../constants/Colors';
@@ -38,12 +40,23 @@ const CategoriesScreen = props => {
 
 // add propoerties to function, which is an object
 // official docs for comprehensive list of properties
-CategoriesScreen.navigationOptions = {
-  headerTitle: "Meal Categories",
-  // headerStyle: {
-  //   backgroundColor: Platform.OS === 'android' ? Colors.primaryColor : ''
-  // },
-  // headerTintColor: Platform.OS === 'android' ? 'white' : Colors.primaryColor
+CategoriesScreen.navigationOptions = navData => {
+  return {
+    headerTitle: "Meal Categories",
+    headerLeft: () => <HeaderButtons HeaderButtonComponent={HeaderButton}>
+      <Item
+        title='Menu'
+        iconName='ios-menu'
+        onPress={() => {
+          navData.navigation.toggleDrawer();
+        }}
+      />
+    </HeaderButtons>
+    // headerStyle: {
+    //   backgroundColor: Platform.OS === 'android' ? Colors.primaryColor : ''
+    // },
+    // headerTintColor: Platform.OS === 'android' ? 'white' : Colors.primaryColor
+  };
 };
 
 // const styles = StyleSheet.create({
