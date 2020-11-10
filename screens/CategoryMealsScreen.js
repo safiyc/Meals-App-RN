@@ -1,9 +1,11 @@
 import React from 'react';
+import { useSelector } from 'react-redux'; // useSelector to grab slice of data from store
 // import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 
-import { CATEGORIES, MEALS } from '../data/dummy-data';
+import { CATEGORIES } from '../data/dummy-data';
 // import MealItem from '../components/MealItem';
 import MealList from '../components/MealList';
+import mealsReducer from '../store/reducers/meals';
 
 const CategoryMealScreen = props => {
   // const renderMealItem = itemData => {
@@ -28,8 +30,13 @@ const CategoryMealScreen = props => {
 
   const catId = props.navigation.getParam('categoryId');
 
+  // 'meals' is from rootReducer found in App.js
+  const availableMeals = useSelector(state => state.meals.filteredMeals);
+
   // const selectedCategory = CATEGORIES.find(cat => cat.id === catId);
-  const displayedMeals = MEALS.filter(meal => meal.categoryIds.indexOf(catId) >= 0);
+  // const displayedMeals = MEALS.filter(meal => meal.categoryIds.indexOf(catId) >= 0);
+
+  const displayedMeals = availableMeals.filter(meal => meal.categoryIds.indexOf(catId) >= 0);
 
   return <MealList listData={displayedMeals} navigation={props.navigation} />;
   // return (

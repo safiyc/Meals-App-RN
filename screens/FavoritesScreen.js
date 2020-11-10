@@ -1,9 +1,10 @@
 import React from 'react';
+import { useSelector } from 'react-redux'; // useSelector to grab slice of data from store
 // import { View, Text, StyleSheet } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import HeaderButton from '../components/HeaderButton';
 import MealList from '../components/MealList';
-import { MEALS } from '../data/dummy-data';
+// import { MEALS } from '../data/dummy-data';
 
 const FavoritesScreen = props => {
   // return (
@@ -11,7 +12,11 @@ const FavoritesScreen = props => {
   //     <Text>The Favorites Screen!</Text>
   //   </View>
   // );
-  const favMeals = MEALS.filter(meal => meal.id === 'm1' || meal.id === 'm2');
+
+  // 'meals' is from rootReducer found in App.js
+  const favMeals = useSelector(state => state.meals.favoriteMeals);
+
+  // const favMeals = availableMeals.filter(meal => meal.id === 'm1' || meal.id === 'm2');
 
   return <MealList listData={favMeals} navigation={props.navigation} />;
 };

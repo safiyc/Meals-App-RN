@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, Text, Button, ScrollView, Image, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux'; // useSelector to grab slice of data from store
+import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
-import { MEALS } from '../data/dummy-data';
+// import { MEALS } from '../data/dummy-data';
 import HeaderButton from '../components/HeaderButton';
 import DefaultText from '../components/DefaultText';
 
@@ -15,8 +16,18 @@ const ListItem = props => {
 }
 
 const MealDetailScreen = props => {
+  const availableMeals = useSelector(state => state.meals.meals);
   const mealId = props.navigation.getParam('mealIdTest');
-  const selectedMeal = MEALS.find(meal => meal.id === mealId);
+
+  const selectedMeal = availableMeals.find(meal => meal.id === mealId);
+
+  // to grab meal title to display on header via navigationOptions
+  // when selectedMeal changes, will prompt useEffect to grab updated title
+  // not a good way to pass data to header in navigationOptions bc useEffect loads after componentDidMount, so a slight delay for meal title to display when page renders
+  // better to load meal title prior in MealList.js
+  // useEffect(() => {
+  //   props.navigation.setParam({mealTitle: selectedMeal.title})
+  // }, [selectedMeal]);
 
   return (
     <ScrollView>
@@ -39,11 +50,15 @@ const MealDetailScreen = props => {
 };
 
 MealDetailScreen.navigationOptions = navigationData => {
-  const mealId = navigationData.navigation.getParam('mealIdTest');
-  const selectedMeal = MEALS.find(meal => meal.id === mealId);
+  // to display meal info on header, can't use useSelector hook inside navigationOptions
+  // better to pass meal title to navigation params in MealList.js, so info is available here
+  // const mealId = navigationData.navigation.getParam('mealIdTest');
+  // const selectedMeal = MEALS.find(meal => meal.id === mealId);
+  const mealTitle = navigationData.navigation.getParam('mealTitle');
+
 
   return {
-    headerTitle: selectedMeal.title,
+    headerTitle: mealTitle,
     headerRight: () => <HeaderButtons HeaderButtonComponent={HeaderButton}>
       <Item
         title='Favorite'
