@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux'; // useSelector to grab slice of data from store
+import React, { useEffect, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux'; // useSelector to grab slice of data from store
 import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 // import { MEALS } from '../data/dummy-data';
 import HeaderButton from '../components/HeaderButton';
 import DefaultText from '../components/DefaultText';
+import { toggleFavorite } from '../store/actions/meals';
 
 const ListItem = props => {
   return (
@@ -17,9 +18,17 @@ const ListItem = props => {
 
 const MealDetailScreen = props => {
   const availableMeals = useSelector(state => state.meals.meals);
-  const mealId = props.navigation.getParam('mealIdTest');
+  const mealId = props.navigation.getParam('mealId');
 
   const selectedMeal = availableMeals.find(meal => meal.id === mealId);
+  // useDispatch can only be used in component body, not in navigationOptions
+  // dispatch func to call on action
+  const dispatch = useDispatch();
+
+  // useCallback prevents infinite loop; func is recreated only when new mealId
+  const toggleFavoriteHandler = useCallback(() => {
+    dispatch(toggleFavorite(mealId));
+  }, [dispatch, mealId]);
 
   // to grab meal title to display on header via navigationOptions
   // when selectedMeal changes, will prompt useEffect to grab updated title
@@ -28,6 +37,11 @@ const MealDetailScreen = props => {
   // useEffect(() => {
   //   props.navigation.setParam({mealTitle: selectedMeal.title})
   // }, [selectedMeal]);
+
+  // useEffect will run again only when toggleFavoriteHandler run (new mealId)
+  useEffect(() => {
+    props.navigation.setParams({ toggleFav: toggleFavoriteHandler });
+  }, [toggleFavoriteHandler]);
 
   return (
     <ScrollView>
@@ -55,7 +69,8 @@ MealDetailScreen.navigationOptions = navigationData => {
   // const mealId = navigationData.navigation.getParam('mealIdTest');
   // const selectedMeal = MEALS.find(meal => meal.id === mealId);
   const mealTitle = navigationData.navigation.getParam('mealTitle');
-
+  // toggleFav gives access to toggleFavoriteHandler funct
+  const toggleFavorite = navigationData.navigation.getParam('toggleFav');
 
   return {
     headerTitle: mealTitle,
@@ -63,9 +78,7 @@ MealDetailScreen.navigationOptions = navigationData => {
       <Item
         title='Favorite'
         iconName='ios-star'
-        onPress={() => {
-          console.log('Mark as fav')
-        }}
+        onPress={toggleFavorite}
       />
     </HeaderButtons>
   }
