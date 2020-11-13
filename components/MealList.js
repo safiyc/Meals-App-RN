@@ -1,10 +1,18 @@
 import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 
-import MealItem from '../components/MealItem';
+import MealItem from './MealItem';
 
 const MealList = props => {
+  // to get isFav param and render star right at initial load
+  const favoriteMeals = useSelector(state => state.meals.favoriteMeals);
+
   const renderMealItem = itemData => {
+    // cant use above useSelector in here bc hooks are allowed only in the root of a component, but can access favoriteMeals from here
+    // 'some' will return true if any meal in favoriteMeals returns true
+    const isFavorite = favoriteMeals.some(meal => meal.id === itemData.item.id);
+
     return (
       <MealItem
         title={itemData.item.title}
@@ -17,7 +25,8 @@ const MealList = props => {
             routeName: 'MealDetail',
             params: {
               mealId: itemData.item.id,
-              mealTitle: itemData.item.title
+              mealTitle: itemData.item.title,
+              isFav: isFavorite
             }
           })
         }

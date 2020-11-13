@@ -19,6 +19,8 @@ const ListItem = props => {
 const MealDetailScreen = props => {
   const availableMeals = useSelector(state => state.meals.meals);
   const mealId = props.navigation.getParam('mealId');
+  // 'some' returns true if fav meal exists
+  const currentMealIsFavorite = useSelector(state => state.meals.favoriteMeals.some(meal => meal.id === mealId));
 
   const selectedMeal = availableMeals.find(meal => meal.id === mealId);
   // useDispatch can only be used in component body, not in navigationOptions
@@ -40,8 +42,13 @@ const MealDetailScreen = props => {
 
   // useEffect will run again only when toggleFavoriteHandler run (new mealId)
   useEffect(() => {
+    // to merge more data to params toggleFav
     props.navigation.setParams({ toggleFav: toggleFavoriteHandler });
   }, [toggleFavoriteHandler]);
+
+  useEffect(() => {
+    props.navigation.setParams({ isFav: currentMealIsFavorite });
+  }, [currentMealIsFavorite]);
 
   return (
     <ScrollView>
@@ -71,13 +78,14 @@ MealDetailScreen.navigationOptions = navigationData => {
   const mealTitle = navigationData.navigation.getParam('mealTitle');
   // toggleFav gives access to toggleFavoriteHandler funct
   const toggleFavorite = navigationData.navigation.getParam('toggleFav');
+  const isFavorite = navigationData.navigation.getParam('isFav');
 
   return {
     headerTitle: mealTitle,
     headerRight: () => <HeaderButtons HeaderButtonComponent={HeaderButton}>
       <Item
         title='Favorite'
-        iconName='ios-star'
+        iconName={isFavorite ? 'ios-star' : 'ios-star-outline'}
         onPress={toggleFavorite}
       />
     </HeaderButtons>
