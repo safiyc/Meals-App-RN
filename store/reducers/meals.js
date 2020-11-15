@@ -1,6 +1,6 @@
 // meals.js manages logic for marking favorite meals and for managing filters
 import { MEALS } from '../../data/dummy-data';
-import { TOGGLE_FAVORITE } from '../actions/meals';
+import { TOGGLE_FAVORITE, SET_FILTERS } from '../actions/meals';
 
 // initial state when app launches
 // at app relaunch, app begins with empty fav meals; need to connect to server and db if want to preserve state
@@ -29,6 +29,34 @@ const mealsReducer = (state = initialState, action) => {
         // concat returns a new array with additional meal
         return { ...state, favoriteMeals: state.favoriteMeals.concat(meal) };
       }
+
+    // the point here is to update filteredMeals arr
+    case SET_FILTERS:
+      // extract filters set by user from action appliedFilters obj
+      const appliedFilters = action.filters;
+      // filter func always brings a new arr; new arr updatedFilteredMeals
+      const updatedFilteredMeals = state.meals.filter(meal => {
+        // if appliedFilters obj has glutenFree key and is not glutenFree, them meal is dropped in updatedFilteredMeals
+        if (appliedFilters.glutenFree && !meal.isGlutenFree) {
+          return false;
+        }
+
+        if (appliedFilters.lactoseFree && !meal.isLactoseFree) {
+          return false;
+        }
+
+        if (appliedFilters.vegetarian && !meal.isVegetarian) {
+          return false;
+        }
+
+        if (appliedFilters.vegan && !meal.isVegan) {
+          return false;
+        }
+
+        // if a meal matches all filter checks, return meal true
+        return true;
+      });
+      return { ...state, filteredMeals: updatedFilteredMeals };
     // default is initial load > initialState
     default:
       return state;
